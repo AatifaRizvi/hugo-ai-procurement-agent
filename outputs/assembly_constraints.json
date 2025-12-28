@@ -1,0 +1,26 @@
+[
+  {
+    "model": "S1_V1",
+    "constraints": []
+  },
+  {
+    "model": "S1_V2",
+    "constraints": []
+  },
+  {
+    "model": "S2_V1",
+    "constraints": []
+  },
+  {
+    "model": "S2_V2",
+    "constraints": []
+  },
+  {
+    "model": "S3_V1",
+    "constraints": []
+  },
+  {
+    "model": "S3_V2",
+    "constraints": []
+  }
+]
