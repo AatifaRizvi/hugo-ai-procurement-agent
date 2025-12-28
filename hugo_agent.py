@@ -56,6 +56,56 @@ Respond clearly and concisely.
 
     return response["message"]["content"]
 
+def answer_user_query(user_question):
+    # Load truth
+    snapshot = load_json(SNAPSHOT_FILE)
+    model_dependencies = load_json(MODEL_DEPS_FILE)
+    email_events = load_json(EMAIL_EVENTS_FILE)
+
+    # Deterministic engines
+    capacity_engine = CapacityEngine(snapshot, model_dependencies)
+    capacity_report = capacity_engine.compute_capacity()
+
+    bottleneck_engine = BottleneckEngine(snapshot, capacity_report)
+    bottlenecks = bottleneck_engine.analyze_bottlenecks()
+
+    supplier_engine = SupplierEngine(email_events, bottlenecks)
+    supplier_report = supplier_engine.analyze_suppliers()
+
+    # Context selection (VERY IMPORTANT)
+    context = {
+        "capacity_report": capacity_report,
+        "bottlenecks": bottlenecks,
+        "supplier_report": supplier_report
+    }
+
+    # Question-aware prompt
+    prompt = f"""
+You are an AI procurement analyst.
+
+Answer the user's question using ONLY the provided context.
+If the answer cannot be determined, say so explicitly.
+
+USER QUESTION:
+{user_question}
+
+CONTEXT:
+{json.dumps(context, indent=2)}
+
+Rules:
+- Do not invent data
+- Do not perform calculations
+- Be precise and actionable
+"""
+
+    response = ollama.chat(
+        model="gemma3:4b",
+        messages=[{"role": "user", "content": prompt}],
+        options={"temperature": 0.2}
+    )
+
+    return response["message"]["content"]
+
 # =====================================================
 # MAIN AGENT
 # =====================================================
