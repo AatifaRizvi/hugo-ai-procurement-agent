@@ -1,0 +1,12 @@
+ollama
+pandas
+numpy
+pdfplumber
+openpyxl
+streamlit
+gradio
+schedule
+requests
+slack_sdk
+matplotlib
+seaborn
