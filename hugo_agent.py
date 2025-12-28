@@ -98,10 +98,10 @@ def run_hugo():
     # -----------------------------
     explanation = run_llm(reasoning_context)
 
-    print("\n🧠 HUGO – PROCUREMENT INTELLIGENCE\n")
+    print("\n HUGO – PROCUREMENT INTELLIGENCE\n")
     print(explanation)
 
-    print("\n🚨 AUTOMATION ALERTS\n")
+    print("\n AUTOMATION ALERTS\n")
     for alert in alerts:
         print("-", alert)
 
