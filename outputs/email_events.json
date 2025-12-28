@@ -1,0 +1,82 @@
+[
+  {
+    "event_type": "delay",
+    "subject": "Delay on O5007 - S1 V1 500W Brushless Motor",
+    "source": "logistics@supA.com",
+    "date": "2025-03-18 09:24",
+    "confidence": "high",
+    "raw_text": "Hi Team,\n\nI'm writing to let you know that Purchase Order **O5007** (S1 V1 500W Brushless Motor, part P300) is now delayed.  \nOur production line experienced a tooling issue last week, so the expected delivery date has shifted from **2025-03-20** to **2025-04-05**.\n\nWe apologize for the inconvenience-this is the first time we've had a delay of this length.  \nPlease let me know if you need any interim stock or partial shipment.\n\nBest,  \nAna Torres  \nSupply Chain Coordinator  \nSupA"
+  },
+  {
+    "event_type": "price_update",
+    "subject": "Price Update for Li-Po 48V 12Ah Battery Pack",
+    "source": "sales@supB.com",
+    "date": "2025-04-05 14:02",
+    "confidence": "high",
+    "raw_text": "Subject: Price Update for Li-Po 48V 12Ah Battery Pack\nFrom: sales@supB.com\nTo: purchasing@voltway.co\nDate: 2025-04-05 14:02\n\nHello Voltway Team,\n\nEffective **2025-05-01**, the unit price for **Li-Po 48V 12Ah Battery Pack** (used in all V2 models, part P302) will increase from **$78.50** to **$85.00**.  \nThis is due to raw material cost increases for cobalt and specialized cell coatings.\n\nIf you'd like to lock in current pricing for any upcoming orders, please confirm by **2025-04-15**.  \nWe can process a blanket PO to cover Q2 consumption at the old rate.\n\nRegards,  \nJin Wu  \nAccount Manager  \nSupB"
+  },
+  {
+    "event_type": "contract_change",
+    "subject": "Amendment to Framework Contract FC-#S60034",
+    "source": "contracts@fleet-giant.com",
+    "date": "2025-03-25 11:17",
+    "confidence": "high",
+    "raw_text": "Subject: Amendment to Framework Contract FC-#S60034\nFrom: contracts@fleet-giant.com\nTo: contracts@voltway.co\nDate: 2025-03-25 11:17\n\nHi Voltway,\n\nUnder our existing framework agreement (Contract **FC-#S60034**), we'd like to adjust the monthly minimum quantity for **S2_V2** scooters from **200 units** to **150 units** starting May 2025.  \nThis is due to slower fleet rollout in the West Coast region.\n\nPlease review and send back a signed amendment by **2025-04-10**. If we don't hear back, we'll assume the old minimum remains in place.\n\nCheers,  \nMarisol Delgado  \nProcurement Lead  \nFleet Giant"
+  },
+  {
+    "event_type": "delay",
+    "subject": "URGENT: Cancel O5021 (Carbon Fiber Frame)",
+    "source": "operations@voltway.co",
+    "date": "2025-04-10 08:55",
+    "confidence": "high",
+    "raw_text": "Subject: URGENT: Cancel O5021 (Carbon Fiber Frame)\nFrom: operations@voltway.co\nTo: orders@supC.com\nDate: 2025-04-10 08:55\n\nHello SupC Team,\n\nPlease cancel Purchase Order **O5021** for **Carbon Fiber Frame** (part P303).  \nWe've decided to delay the V1\u2192V2 upgrade rollout, so we no longer need these frames.\n\nLet me know if there are any cancellation fees. If so, please send an updated invoice.\n\nThanks,  \nJordan Lee  \nWarehouse Manager  \nVoltway"
+  },
+  {
+    "event_type": "discontinuation",
+    "subject": "Discontinuation of LCD Dashboard Display",
+    "source": "product-updates@supA.com",
+    "date": "2025-03-30 16:40",
+    "confidence": "high",
+    "raw_text": "Subject: Discontinuation of LCD Dashboard Display\nFrom: product-updates@supA.com\nTo: engineering@voltway.co\nDate: 2025-03-30 16:40\n\nHi Engineers,\n\nWe're discontinuing the **LCD Dashboard Display** (part P312) at the end of Q2 2025, replacing it with an OLED unit.  \nLast buy date is **2025-06-15**; after that, we cannot supply any more LCD displays.\n\nPlease update your BOMs accordingly or submit a final PO by **2025-05-15**.\n\nThanks,  \nRaj Patel  \nProduct Manager  \nSupA"
+  },
+  {
+    "event_type": "proposal",
+    "subject": "Proposal: Digital Controller ZX2 for S-Series",
+    "source": "proposals@supD.com",
+    "date": "2025-04-08 10:05",
+    "confidence": "high",
+    "raw_text": "Subject: Proposal: Digital Controller ZX2 for S-Series\nFrom: proposals@supD.com\nTo: engineering@voltway.co\nDate: 2025-04-08 10:05\n\nHello Voltway Team,\n\nWe'd like to propose our new **Digital Controller ZX2** as an upgrade path for your **Analog Controller ZX** (P301).  \nKey benefits:\n- 20% improved throttle response  \n- Built-in temperature monitoring  \n- Drop-in form factor (no re-routing of cables needed)\n\nWe can sample 50 units by **2025-04-20**. Let me know if you'd like a pilot order.\n\nBest regards,  \nMia Chen  \nBusiness Development  \nSupD"
+  },
+  {
+    "event_type": "partial_shipment",
+    "subject": "Partial Shipment for O5045 - Mechanical Disc Brake",
+    "source": "shipping@supB.com",
+    "date": "2025-04-12 13:32",
+    "confidence": "high",
+    "raw_text": "Subject: Partial Shipment for O5045 - Mechanical Disc Brake\nFrom: shipping@supB.com\nTo: warehouse_manager@voltway.co\nDate: 2025-04-12 13:32\n\nHi there,\n\nThis is to confirm we've shipped **60 of 100** units for PO **O5045** (Mechanical Disc Brake, part P313).  \nTracking Number: **1Z999AA10123456784**  \nExpected arrival: **2025-04-15**.\n\nRemaining 40 units are scheduled for dispatch on **2025-04-20**.\n\nLet me know if you need to expedite the balance.\n\nThanks,  \nSamir Khan  \nLogistics Coordinator  \nSupB"
+  },
+  {
+    "event_type": "partial_shipment",
+    "subject": "Early Partial Shipment for O5075 - 12-inch Alloy Wheel",
+    "source": "shipping@supC.com",
+    "date": "2025-04-15 10:45",
+    "confidence": "high",
+    "raw_text": "Subject: Early Partial Shipment for O5075 - 12-inch Alloy Wheel\nFrom: shipping@supC.com\nTo: warehouse_manager@voltway.co\nDate: 2025-04-15 10:45\n\nHello Voltway Team,\n\nGood news-PO **O5075** (12-inch Alloy Wheel, part **P330**) has partially shipped ahead of schedule.  \nWe've dispatched **40 of 60** wheels today via Express Freight (Tracking #XJ123456789).  \nExpected delivery: **2025-04-18** (instead of the original 2025-04-22).\n\nThe remaining 20 units will ship on **2025-04-25**.  \nLet us know if you'd like us to combine the final shipment with another order.\n\nCheers,  \nElena Rodriguez  \nLogistics Coordinator  \nSupC"
+  },
+  {
+    "event_type": "quality_alert",
+    "subject": "URGENT: Quality Alert on S3 V2 Carbon Fiber Frame",
+    "source": "qa-team@supA.com",
+    "date": "2025-04-18 08:05",
+    "confidence": "high",
+    "raw_text": "Subject: URGENT: Quality Alert on S3 V2 Carbon Fiber Frame\nFrom: qa-team@supA.com\nTo: engineering@voltway.co\nDate: 2025-04-18 08:05\n\nHi Engineering Team,\n\nDuring our final QC check, we identified **hairline cracks** on several units of the **S3 V2 Carbon Fiber Frame** (part **P323**).  \nAffected batch: PO **O5023**, shipped 2025-04-10.\n\nPhotos attached show stress points near the rear mount.  \nWe recommend halting assembly on incoming frames from this batch and returning the lot for inspection.\n\nPlease advise on next steps for containment and replacement orders.\n\nRegards,  \nMark Nguyen  \nQA Lead  \nSupA"
+  },
+  {
+    "event_type": "price_update",
+    "subject": "Q2 Discount on S2 V1 Li-Ion 36V 10Ah Battery Pack",
+    "source": "sales@supA.com",
+    "date": "2025-04-20 14:30",
+    "confidence": "high",
+    "raw_text": "Subject: Q2 Discount on S2 V1 Li-Ion 36V 10Ah Battery Pack\nFrom: sales@supA.com\nTo: purchasing@voltway.co\nDate: 2025-04-20 14:30\n\nHello Voltway Purchasing,\n\nTo support your Q2 ramp-up, we're offering a **5% discount** on the **S2 V1 Li-Ion 36V 10Ah Battery Pack** (part **P309**) for any order of **200+ units** placed by **2025-05-05**.\n\nRegular price: $65.00 \u2192 Discounted price: **$61.75** ea.  \nMinimum order qty still applies (50 units).\n\nLet me know if you'd like to set up a blanket PO or discuss scheduling.\n\nBest,  \nSonia Patel  \nAccount Executive  \nSupA"
+  }
+]
