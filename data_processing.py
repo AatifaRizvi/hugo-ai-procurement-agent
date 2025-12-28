@@ -18,7 +18,7 @@ from email.parser import BytesParser
 # PATH CONFIGURATION (MATCHES YOUR PROJECT STRUCTURE)
 # =====================================================
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data" / "hugo_data_samples"
 EMAIL_DIR = DATA_DIR / "emails"
 SPECS_DIR = DATA_DIR / "specs"
