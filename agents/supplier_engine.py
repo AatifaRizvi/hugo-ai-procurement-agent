@@ -1,4 +1,5 @@
 # agents/supplier_engine.py
+
 class SupplierEngine:
     def __init__(self, snapshot):
         self.snapshot = snapshot

@@ -1,4 +1,5 @@
 # agents/bottleneck_engine.py
+
 class BottleneckEngine:
     def __init__(self, snapshot):
         self.snapshot = snapshot
