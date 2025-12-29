@@ -102,12 +102,26 @@ class HugoAgent:
 
     def ask(self, user_question):
         context = self.compute_context()
+        is_what_if = "what if" in user_question.lower()
+        if is_what_if:
+            context["hypothetical_note"] = (
+        "This is a hypothetical scenario. "
+        "No inventory, capacity, or supplier data has been modified."
+            )
 
         prompt = f"""
 You are an AI procurement analyst.
 
 Answer the user's question using ONLY the provided context.
 If the answer cannot be determined, say so explicitly.
+
+After your answer, add:
+Confidence: High / Medium / Low
+
+Confidence rules:
+- High: clear capacity + bottleneck data exists
+- Medium: partial signals, some uncertainty
+- Low: insufficient or indirect data
 
 USER QUESTION:
 {user_question}
@@ -120,6 +134,7 @@ Rules:
 - Do not perform calculations
 - Be precise and actionable
 """
+
 
         response = ollama.chat(
             model="gemma3:4b",

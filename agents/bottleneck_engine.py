@@ -30,7 +30,12 @@ class BottleneckEngine:
                     severity = "critical"
                 else:
                     severity = "warning"
-
+                if severity == "blocking":
+                    priority = "P1"
+                elif severity == "critical":
+                    priority = "P2"
+                else:
+                    priority = "P3"
                 # ----------------------------
                 # Root cause
                 # ----------------------------
@@ -61,6 +66,7 @@ class BottleneckEngine:
                     "part_id": part_id,
                     "days_of_cover": round(days, 2),
                     "severity": severity,
+                    "priority": priority,
                     "root_cause": cause,
                     "used_in_models": used_in_models,
                     "capacity_impact": impacted_models,
