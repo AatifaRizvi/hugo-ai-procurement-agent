@@ -6,7 +6,9 @@
     "days_of_cover": 1.22,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -18,7 +20,9 @@
     "days_of_cover": 2.01,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -30,7 +34,9 @@
     "days_of_cover": 0.93,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -42,7 +48,9 @@
     "days_of_cover": 2.0,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -54,7 +62,9 @@
     "days_of_cover": Infinity,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V2"
+    ],
     "risk_flags": [
       null
     ]
@@ -66,7 +76,9 @@
     "days_of_cover": 0.11,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -78,7 +90,9 @@
     "days_of_cover": 0.53,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -90,7 +104,9 @@
     "days_of_cover": 0.19,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -102,7 +118,9 @@
     "days_of_cover": 0.2,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S2_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -114,7 +132,9 @@
     "days_of_cover": 0.8,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S2_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -126,7 +146,9 @@
     "days_of_cover": 1.78,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S2_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -138,7 +160,9 @@
     "days_of_cover": 0.69,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S2_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -150,7 +174,9 @@
     "days_of_cover": Infinity,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S2_V2"
+    ],
     "risk_flags": [
       null
     ]
@@ -162,7 +188,9 @@
     "days_of_cover": Infinity,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S2_V2"
+    ],
     "risk_flags": [
       null
     ]
@@ -174,7 +202,9 @@
     "days_of_cover": 2.53,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S2_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -186,7 +216,9 @@
     "days_of_cover": 0.49,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S2_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -198,7 +230,9 @@
     "days_of_cover": 0.29,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S3_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -210,7 +244,9 @@
     "days_of_cover": 1.34,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S3_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -222,7 +258,9 @@
     "days_of_cover": 2.7,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S3_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -234,7 +272,9 @@
     "days_of_cover": 1.06,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S3_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -246,7 +286,9 @@
     "days_of_cover": 1.3,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -258,7 +300,9 @@
     "days_of_cover": 1.36,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -270,7 +314,9 @@
     "days_of_cover": 5.87,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S3_V2"
+    ],
     "risk_flags": [
       null
     ]
@@ -282,7 +328,9 @@
     "days_of_cover": 0.3,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -294,7 +342,11 @@
     "days_of_cover": 0.41,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S2_V1",
+      "S3_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -306,7 +358,11 @@
     "days_of_cover": 1.4,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S2_V1",
+      "S3_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -318,7 +374,11 @@
     "days_of_cover": Infinity,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S2_V1",
+      "S3_V1"
+    ],
     "risk_flags": [
       null
     ]
@@ -330,7 +390,11 @@
     "days_of_cover": 1.65,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S2_V1",
+      "S3_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -342,7 +406,11 @@
     "days_of_cover": 1.0,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S2_V1",
+      "S3_V1"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -354,7 +422,11 @@
     "days_of_cover": 0.35,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V2",
+      "S2_V2",
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -366,7 +438,11 @@
     "days_of_cover": 0.44,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V2",
+      "S2_V2",
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -378,7 +454,11 @@
     "days_of_cover": 0.54,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V2",
+      "S2_V2",
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -390,7 +470,11 @@
     "days_of_cover": 0.26,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V2",
+      "S2_V2",
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -402,7 +486,11 @@
     "days_of_cover": 1.01,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V2",
+      "S2_V2",
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -414,7 +502,14 @@
     "days_of_cover": 2.03,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S1_V2",
+      "S2_V1",
+      "S2_V2",
+      "S3_V1",
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -426,7 +521,14 @@
     "days_of_cover": 1.33,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S1_V2",
+      "S2_V1",
+      "S2_V2",
+      "S3_V1",
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
@@ -438,7 +540,14 @@
     "days_of_cover": Infinity,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S1_V2",
+      "S2_V1",
+      "S2_V2",
+      "S3_V1",
+      "S3_V2"
+    ],
     "risk_flags": [
       null
     ]
@@ -450,7 +559,14 @@
     "days_of_cover": Infinity,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S1_V2",
+      "S2_V1",
+      "S2_V2",
+      "S3_V1",
+      "S3_V2"
+    ],
     "risk_flags": [
       null
     ]
@@ -462,7 +578,14 @@
     "days_of_cover": 0.27,
     "safety_stock": null,
     "next_po_arrival_days": null,
-    "used_in_models": [],
+    "used_in_models": [
+      "S1_V1",
+      "S1_V2",
+      "S2_V1",
+      "S2_V2",
+      "S3_V1",
+      "S3_V2"
+    ],
     "risk_flags": [
       "stockout_risk"
     ]
