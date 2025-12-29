@@ -56,31 +56,43 @@ Respond clearly and concisely.
 
     return response["message"]["content"]
 
-def answer_user_query(user_question):
-    # Load truth
-    snapshot = load_json(SNAPSHOT_FILE)
-    model_dependencies = load_json(MODEL_DEPS_FILE)
-    email_events = load_json(EMAIL_EVENTS_FILE)
+# =====================================================
+# HUGO AGENT CLASS
+# =====================================================
 
-    # Deterministic engines
-    capacity_engine = CapacityEngine(snapshot, model_dependencies)
-    capacity_report = capacity_engine.compute_capacity()
+class HugoAgent:
+    def __init__(self):
+        # Load data
+        self.snapshot = load_json(SNAPSHOT_FILE)
+        self.model_dependencies = load_json(MODEL_DEPS_FILE)
+        self.email_events = load_json(EMAIL_EVENTS_FILE)
 
-    bottleneck_engine = BottleneckEngine(snapshot, capacity_report)
-    bottlenecks = bottleneck_engine.analyze_bottlenecks()
+        # Initialize deterministic engines
+        self.capacity_engine = CapacityEngine(self.snapshot, self.model_dependencies)
+        self.bottleneck_engine = BottleneckEngine(self.snapshot, self.capacity_engine.compute_capacity())
+        self.supplier_engine = SupplierEngine(self.email_events, self.bottleneck_engine.analyze_bottlenecks())
+        self.automation_engine = AutomationEngine(self.snapshot)
 
-    supplier_engine = SupplierEngine(email_events, bottlenecks)
-    supplier_report = supplier_engine.analyze_suppliers()
+    def compute_context(self):
+        # Build full reasoning context
+        capacity_report = self.capacity_engine.compute_capacity()
+        bottlenecks = self.bottleneck_engine.analyze_bottlenecks()
+        supplier_report = self.supplier_engine.analyze_suppliers()
+        alerts = self.automation_engine.run_automation()
 
-    # Context selection (VERY IMPORTANT)
-    context = {
-        "capacity_report": capacity_report,
-        "bottlenecks": bottlenecks,
-        "supplier_report": supplier_report
-    }
+        context = {
+            "capacity_report": capacity_report,
+            "bottlenecks": bottlenecks,
+            "supplier_report": supplier_report,
+            "alerts": alerts
+        }
 
-    # Question-aware prompt
-    prompt = f"""
+        return context
+
+    def ask(self, user_question):
+        context = self.compute_context()
+
+        prompt = f"""
 You are an AI procurement analyst.
 
 Answer the user's question using ONLY the provided context.
@@ -98,66 +110,16 @@ Rules:
 - Be precise and actionable
 """
 
-    response = ollama.chat(
-        model="gemma3:4b",
-        messages=[{"role": "user", "content": prompt}],
-        options={"temperature": 0.2}
-    )
+        response = ollama.chat(
+            model="gemma3:4b",
+            messages=[{"role": "user", "content": prompt}],
+            options={"temperature": 0.2}
+        )
 
-    return response["message"]["content"]
+        return response["message"]["content"]
 
-# =====================================================
-# MAIN AGENT
-# =====================================================
-
-def run_hugo():
-    # -----------------------------
-    # Load preprocessed truth
-    # -----------------------------
-    snapshot = load_json(SNAPSHOT_FILE)
-    model_dependencies = load_json(MODEL_DEPS_FILE)
-    email_events = load_json(EMAIL_EVENTS_FILE)
-
-    # -----------------------------
-    # Deterministic engines
-    # -----------------------------
-    capacity_engine = CapacityEngine(snapshot, model_dependencies)
-    capacity_report = capacity_engine.compute_capacity()
-
-    bottleneck_engine = BottleneckEngine(snapshot, capacity_report)
-    bottlenecks = bottleneck_engine.analyze_bottlenecks()
-
-    supplier_engine = SupplierEngine(email_events, bottlenecks)
-    supplier_report = supplier_engine.analyze_suppliers()
-
-    automation_engine = AutomationEngine(snapshot)
-    alerts = automation_engine.run_automation()
-
-    # -----------------------------
-    # Reasoning context
-    # -----------------------------
-    reasoning_context = {
-        "capacity_report": capacity_report,
-        "bottlenecks": bottlenecks,
-        "supplier_report": supplier_report,
-        "alerts": alerts
-    }
-
-    # -----------------------------
-    # LLM reasoning
-    # -----------------------------
-    explanation = run_llm(reasoning_context)
-
-    print("\n HUGO – PROCUREMENT INTELLIGENCE\n")
-    print(explanation)
-
-    print("\n AUTOMATION ALERTS\n")
-    for alert in alerts:
-        print("-", alert)
-
-# =====================================================
-# ENTRY POINT
-# =====================================================
-
-if __name__ == "__main__":
-    run_hugo()
+    # run full Hugo reasoning
+    def run_full_analysis(self):
+        context = self.compute_context()
+        explanation = run_llm(context)
+        return explanation
