@@ -10,3 +10,4 @@ requests
 slack_sdk
 matplotlib
 seaborn
+pyngrok
