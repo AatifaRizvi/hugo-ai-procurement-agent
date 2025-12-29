@@ -6,6 +6,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from hugo_agent import HugoAgent
+import numpy as np
 
 # =====================================================
 # PAGE CONFIG
@@ -149,11 +150,16 @@ with tabs[4]:
     if st.button("Run Simulation"):
         # --- Ensure all capacity columns are numeric ---
         numeric_capacity_df = capacity_df.apply(pd.to_numeric, errors='coerce')
-
+        MAX_DISPLAY_CAPACITY = 999  
         # --- Run the demand spike simulation ---
         simulated = numeric_capacity_df * (1 + spike / 100)
-        simulated = simulated.astype(int)  # optional: convert to integers
 
+        # Handle non-finite values safely
+        simulated = simulated.replace([np.inf, -np.inf], None)
+        simulated = simulated.fillna(0)
+
+        # Convert to int for visualization
+        simulated = simulated.astype(int)
         # Prepare for chart
         sim_long = simulated.reset_index().melt(
             var_name="Model",
@@ -171,7 +177,7 @@ with tabs[4]:
 
         st.subheader("⚠️ Likely Bottlenecks")
         st.dataframe(bottlenecks_df, use_container_width=True)
-
+        st.caption("Note: 999 indicates effectively unconstrained capacity.")
 # =====================================================
 # FOOTER
 # =====================================================
