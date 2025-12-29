@@ -19,6 +19,8 @@ OUTPUT_DIR = BASE_DIR / "outputs"
 SNAPSHOT_FILE = OUTPUT_DIR / "operational_snapshot.json"
 MODEL_DEPS_FILE = OUTPUT_DIR / "model_dependencies.json"
 EMAIL_EVENTS_FILE = OUTPUT_DIR / "email_events.json"
+BOM_QTY_FILE = OUTPUT_DIR / "model_bom_quantities.json"
+ASSEMBLY_FILE = OUTPUT_DIR / "assembly_constraints.json"
 
 # =====================================================
 # HELPERS
@@ -62,32 +64,41 @@ Respond clearly and concisely.
 
 class HugoAgent:
     def __init__(self):
-        # Load data
         self.snapshot = load_json(SNAPSHOT_FILE)
         self.model_dependencies = load_json(MODEL_DEPS_FILE)
         self.email_events = load_json(EMAIL_EVENTS_FILE)
+        self.bom_quantities = load_json(BOM_QTY_FILE)
+        self.assembly_constraints = load_json(ASSEMBLY_FILE)
 
-        # Initialize deterministic engines
-        self.capacity_engine = CapacityEngine(self.snapshot, self.model_dependencies)
-        self.bottleneck_engine = BottleneckEngine(self.snapshot, self.capacity_engine.compute_capacity())
-        self.supplier_engine = SupplierEngine(self.email_events, self.bottleneck_engine.analyze_bottlenecks())
+        self.capacity_engine = CapacityEngine(
+            self.snapshot,
+            self.model_dependencies,
+            self.bom_quantities
+        )
+        self.capacity_report = self.capacity_engine.compute_capacity()
+
+        self.bottleneck_engine = BottleneckEngine(
+            self.snapshot,
+            self.capacity_report,
+            self.assembly_constraints
+        )
+        self.bottlenecks = self.bottleneck_engine.analyze_bottlenecks()
+
+        self.supplier_engine = SupplierEngine(
+            self.email_events,
+            self.bottlenecks
+        )
+
         self.automation_engine = AutomationEngine(self.snapshot)
 
     def compute_context(self):
-        # Build full reasoning context
-        capacity_report = self.capacity_engine.compute_capacity()
-        bottlenecks = self.bottleneck_engine.analyze_bottlenecks()
-        supplier_report = self.supplier_engine.analyze_suppliers()
-        alerts = self.automation_engine.run_automation()
-
-        context = {
-            "capacity_report": capacity_report,
-            "bottlenecks": bottlenecks,
-            "supplier_report": supplier_report,
-            "alerts": alerts
+        return {
+            "capacity_report": self.capacity_report,
+            "bottlenecks": self.bottlenecks,
+            "supplier_report": self.supplier_engine.analyze_suppliers(),
+            "alerts": self.automation_engine.run_automation(),
+            "assembly_constraints": self.assembly_constraints
         }
-
-        return context
 
     def ask(self, user_question):
         context = self.compute_context()
@@ -118,8 +129,5 @@ Rules:
 
         return response["message"]["content"]
 
-    # run full Hugo reasoning
     def run_full_analysis(self):
-        context = self.compute_context()
-        explanation = run_llm(context)
-        return explanation
+        return run_llm(self.compute_context())

@@ -1,55 +1,43 @@
 # agents/capacity_engine.py
 
 class CapacityEngine:
-    """
-    Deterministic build capacity calculation.
-    Uses only inventory snapshot and model dependency info.
-    """
-
-    def __init__(self, snapshot, model_dependencies):
+    def __init__(self, snapshot, model_dependencies, bom_quantities):
         self.snapshot = snapshot
         self.model_dependencies = model_dependencies
+        self.bom_quantities = bom_quantities
 
-        # Build quick lookup: part_id -> on_hand
         self.inventory = {
             part["part_id"]: part.get("on_hand", 0)
             for part in snapshot
         }
 
     def compute_capacity(self):
-        """
-        Returns build capacity per model.
-        """
         capacity_report = {}
 
         for model_entry in self.model_dependencies:
             model = model_entry["model"]
             parts = model_entry["part_id"]
 
-            # Compute how many units each part allows
-            part_limits = []
+            part_limits = {}
+
             for part_id in parts:
                 on_hand = self.inventory.get(part_id, 0)
-                part_limits.append(on_hand)  # qty per model = 1
+                qty_required = self.bom_quantities.get(model, {}).get(part_id, 1)
 
-            if not part_limits:
-                max_units = 0
-            else:
-                max_units = min(part_limits)
+                part_limits[part_id] = on_hand // qty_required
 
-            if max_units == 0:
-                status = "blocked"
-            elif max_units < 5:
-                status = "constrained"
-            else:
-                status = "ok"
+            max_units = min(part_limits.values()) if part_limits else 0
 
             capacity_report[model] = {
                 "max_buildable_units": max_units,
-                "capacity_status": status,
                 "limiting_parts": [
-                    p for p in parts if self.inventory.get(p, 0) == max_units
-                ]
+                    p for p, v in part_limits.items() if v == max_units
+                ],
+                "capacity_status": (
+                    "blocked" if max_units == 0
+                    else "constrained" if max_units < 5
+                    else "ok"
+                )
             }
 
         return capacity_report

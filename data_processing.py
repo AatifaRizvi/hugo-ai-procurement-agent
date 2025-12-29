@@ -14,22 +14,18 @@ import pdfplumber
 from email import policy
 from email.parser import BytesParser
 
-<<<<<<< HEAD
-# -----------------------------
-# PATH CONFIGURATION
-# -----------------------------
-=======
 # =====================================================
 # PATH CONFIGURATION (MATCHES YOUR PROJECT STRUCTURE)
 # =====================================================
 
->>>>>>> 3d1173089c8e952c50f9aaa4c1dd1aeb39cdb4d2
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data" / "hugo_data_samples"
 EMAIL_DIR = DATA_DIR / "emails"
 SPECS_DIR = DATA_DIR / "specs"
 OUTPUT_DIR = BASE_DIR / "outputs"
-
+DATA_DIR2= BASE_DIR / "data"/"processed_data"
+ENGINEERING_BOM_FILE = DATA_DIR2 / "engineering_bom.json"
+ASSEMBLY_CONSTRAINTS_FILE = DATA_DIR2 / "assembly_constraints.json"
 # Ensure output folder exists
 OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -165,27 +161,21 @@ def run_hugo():
     # -----------------------------
     # Specs parsing
     # -----------------------------
-    BOM_PATTERN = re.compile(r"(P\d{3})\s+(.+?)\s+(\d+)(?:\s+.*)?$")
-    specs_bom = []
-    assembly_constraints = []
-    for pdf_file in SPECS_DIR.glob("*.pdf"):
-        model = pdf_file.stem.replace("scanned_", "").replace("_specs", "")
-        text_lines = []
-        with pdfplumber.open(pdf_file) as pdf:
-            for page in pdf.pages:
-                t = page.extract_text()
-                if t: text_lines.extend(t.splitlines())
-        for line in text_lines:
-            m = BOM_PATTERN.search(line)
-            if m: specs_bom.append({"model": model,
-                                    "part_id": m.group(1),
-                                    "part_name": m.group(2).strip(),
-                                    "quantity": int(m.group(3))})
-        constraints = [line.strip() for line in text_lines if any(k in line.lower() for k in ["torque","calibrate","verify","inspect","seal","update","test"])]
-        assembly_constraints.append({"model": model, "constraints": constraints})
-    with open(OUTPUT_DIR / "specs_bom.json", "w") as f: json.dump(specs_bom, f, indent=2)
-    with open(OUTPUT_DIR / "assembly_constraints.json", "w") as f: json.dump(assembly_constraints, f, indent=2)
-    print("Specs processed")
+    with open(ENGINEERING_BOM_FILE, "r", encoding="utf-8") as f:
+        model_bom_quantities = json.load(f)
+
+    with open(OUTPUT_DIR / "model_bom_quantities.json", "w", encoding="utf-8") as f:
+        json.dump(model_bom_quantities, f, indent=2)
+
+    print("✅ Engineering BOM quantities written")
+
+    with open(ASSEMBLY_CONSTRAINTS_FILE, "r", encoding="utf-8") as f:
+        assembly_constraints = json.load(f)
+
+    with open(OUTPUT_DIR / "assembly_constraints.json", "w", encoding="utf-8") as f:
+        json.dump(assembly_constraints, f, indent=2)
+
+    print("✅ Assembly constraints written")
 
     # -----------------------------
     # Inventory health
@@ -214,7 +204,7 @@ def run_hugo():
         next_arrival = None
         if not pos.empty:
             next_arrival = min((pd.to_datetime(pos["expected_date"]) - TODAY).dt.days)
-        used_in_models = [b["model"] for b in specs_bom if b["part_id"]==part_id]
+        used_in_models = [m["model"] for m in model_dependencies if part_id in m["part_id"]]
         snapshot.append({"part_id": part_id,
                          "on_hand": row["on_hand"],
                          "avg_daily_consumption": round(row["avg_daily_consumption"],2),
