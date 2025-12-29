@@ -1,12 +1,22 @@
-ollama
-pandas
-numpy
-pdfplumber
-openpyxl
-streamlit
-gradio
-schedule
-requests
-slack_sdk
-matplotlib
-seaborn
+# LLM & AI
+ollama==0.6.1
+
+# Data Processing
+pandas==2.0.3       # Windows prebuilt wheel
+numpy==1.26.4
+openpyxl==3.1.3
+pdfplumber==0.9.0
+
+# Web Dashboard
+streamlit==1.28.0
+gradio==3.42.1
+
+# Scheduling & Requests
+schedule==1.2.0
+requests==2.31.0
+slack_sdk==3.24.0
+
+# Visualization
+matplotlib==3.8.1
+seaborn==0.12.3
+plotly==5.16.1
