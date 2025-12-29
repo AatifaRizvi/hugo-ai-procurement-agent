@@ -1,158 +1,179 @@
-# app.py
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from hugo_agent import HugoAgent
 
-# ---------------------------
-# Page Config
-# ---------------------------
+# =====================================================
+# PAGE CONFIG
+# =====================================================
 st.set_page_config(
     page_title="Hugo – AI Procurement Agent",
     page_icon="🛵",
     layout="wide"
 )
 
-# ---------------------------
-# Initialize Hugo Agent
-# ---------------------------
+# =====================================================
+# LOAD HUGO AGENT
+# =====================================================
 @st.cache_resource
-def load_hugo_agent():
+def load_hugo():
     return HugoAgent()
 
-hugo = load_hugo_agent()
+hugo = load_hugo()
 
-# ---------------------------
-# Tabs
-# ---------------------------
-tabs = st.tabs(["🏠 Dashboard", "💬 Ask Hugo", "📊 Analytics", "⚠️ Alerts", "🔮 Scenario Simulation"])
+# =====================================================
+# TABS
+# =====================================================
+tabs = st.tabs([
+    "🏠 Dashboard",
+    "💬 Ask Hugo",
+    "📊 Analytics",
+    "⚠️ Alerts",
+    "🔮 Scenario Simulation"
+])
 
-# ---------------------------
-# Dashboard Tab
-# ---------------------------
+# =====================================================
+# 🏠 DASHBOARD
+# =====================================================
 with tabs[0]:
     st.title("Hugo – AI Procurement Dashboard")
-    
+
     context = hugo.compute_context()
-    capacity_report = pd.DataFrame(context["capacity_report"])
-    bottlenecks = pd.DataFrame(context["bottlenecks"])
-    supplier_report = pd.DataFrame(context["supplier_report"])
+
+    capacity_df = pd.DataFrame(context["capacity_report"])
+    bottlenecks_df = pd.DataFrame(context["bottlenecks"])
+    supplier_df = pd.DataFrame(context["supplier_report"])
     alerts = context["alerts"]
 
     # Metrics
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Total Scooter Models", len(capacity_report.columns))
-    col2.metric("Bottlenecked Parts", bottlenecks.shape[0])
-    col3.metric("Supplier Alerts", len(alerts))
-
-    # Convert capacity to long format for Plotly
-    capacity_long = capacity_report.reset_index().melt(
-        var_name='model',
-        value_name='max_units'
-    )
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Scooter Models", len(capacity_df.columns))
+    c2.metric("Bottlenecks", len(bottlenecks_df))
+    c3.metric("Active Alerts", len(alerts))
 
     # Capacity Chart
     st.subheader("📊 Build Capacity by Model")
-    fig = px.bar(
-        capacity_long,
-        x='model',
-        y='max_units',
-        color='max_units',
-        labels={'model': 'Scooter Model', 'max_units': 'Max Units'},
-        text='max_units'
+    cap_long = capacity_df.reset_index().melt(
+        var_name="Model",
+        value_name="Max Units"
     )
+
+    fig = px.bar(
+        cap_long,
+        x="Model",
+        y="Max Units",
+        text="Max Units"
+    )
+    fig.update_layout(template="plotly_white")
     st.plotly_chart(fig, use_container_width=True)
 
-    # Bottleneck Table
-    st.subheader("⚠️ Bottleneck Analysis")
-    st.dataframe(bottlenecks)
+    # Tables
+    st.subheader("⚠️ Bottlenecks")
+    st.dataframe(bottlenecks_df, use_container_width=True)
 
-    # Supplier Risk Table
-    st.subheader("📈 Supplier Risk")
-    st.dataframe(supplier_report)
+    st.subheader("🏭 Supplier Risk")
+    st.dataframe(supplier_df, use_container_width=True)
 
-# ---------------------------
-# LLM Query Tab
-# ---------------------------
+# =====================================================
+# 💬 ASK HUGO (CHAT MODE)
+# =====================================================
 with tabs[1]:
-    st.header("💬 Ask Hugo Any Operational Question")
-    question = st.text_input(
-        "Enter your question:",
-        placeholder="e.g., Which parts are at risk if webshop demand spikes 20%?"
+    st.header("💬 Ask Hugo – AI Reasoning Agent")
+
+    if "chat" not in st.session_state:
+        st.session_state.chat = []
+
+    # Show chat history
+    for msg in st.session_state.chat:
+        st.chat_message(msg["role"]).markdown(msg["content"])
+
+    # Chat input
+    user_input = st.chat_input(
+        "Ask about capacity, bottlenecks, suppliers, demand scenarios..."
     )
-    if st.button("Ask Hugo"):
-        with st.spinner("Hugo is reasoning..."):
-            response = hugo.ask(question)
-        st.markdown("### Hugo's Answer")
-        st.markdown(response)
 
-# ---------------------------
-# Analytics Tab
-# ---------------------------
+    if user_input:
+        st.chat_message("user").markdown(user_input)
+
+        with st.spinner("Hugo is thinking..."):
+            response = hugo.ask(user_input)
+
+        st.chat_message("assistant").markdown(response)
+
+        st.session_state.chat.append({
+            "role": "user",
+            "content": user_input
+        })
+        st.session_state.chat.append({
+            "role": "assistant",
+            "content": response
+        })
+
+# =====================================================
+# 📊 ANALYTICS
+# =====================================================
 with tabs[2]:
-    st.header("📊 Detailed Analytics")
-    st.subheader("Build Capacity Table")
-    st.dataframe(capacity_report)
-    
-    st.subheader("Bottleneck Heatmap")
-    if not bottlenecks.empty:
-        corr = bottlenecks.select_dtypes(include='number').corr()
-        fig2 = px.imshow(corr, text_auto=True, aspect="auto", color_continuous_scale='RdBu_r')
-        st.plotly_chart(fig2, use_container_width=True)
+    st.header("📊 System-Wide Analysis")
+    st.info("High-level AI-generated overview of operations.")
+    st.markdown(hugo.run_full_analysis())
 
-# ---------------------------
-# Alerts Tab
-# ---------------------------
+# =====================================================
+# ⚠️ ALERTS
+# =====================================================
 with tabs[3]:
     st.header("⚠️ Automation Alerts")
+
     if alerts:
-        for a in alerts:
-            st.warning(a)
+        for alert in alerts:
+            st.warning(alert)
     else:
-        st.success("No critical alerts currently.")
+        st.success("No critical alerts detected.")
 
-# ---------------------------
-# Scenario Simulation Tab
-# ---------------------------
+# =====================================================
+# 🔮 SCENARIO SIMULATION
+# =====================================================
 with tabs[4]:
-    st.header("🔮 What-If Scenario Simulation")
-    spike = st.slider("Increase webshop demand by (%)", 0, 100, 20)
-    if st.button("Run Simulation"):
-        with st.spinner("Running scenario simulation..."):
-            # Copy the original capacity_report and adjust for spike
-            simulated_capacity = capacity_report.copy()
-            simulated_capacity = simulated_capacity.apply(lambda x: (x * (1 + spike/100)).astype(int))
-            
-            # Convert to long format
-            sim_long = simulated_capacity.reset_index().melt(
-                var_name='model',
-                value_name='max_units'
-            )
-            
-            # Plot simulated capacity
-            fig3 = px.bar(
-                sim_long,
-                x='model',
-                y='max_units',
-                color='max_units',
-                labels={'model':'Scooter Model', 'max_units':'Simulated Units'},
-                text='max_units'
-            )
-            st.plotly_chart(fig3, use_container_width=True)
-            
-            # Show bottlenecks (use original for now, can extend with prediction)
-            st.subheader("Predicted Bottlenecks / At-Risk Parts")
-            st.dataframe(bottlenecks)
+    st.header("🔮 Demand Spike Simulation")
 
-# ---------------------------
-# Footer / Example Questions
-# ---------------------------
+    spike = st.slider(
+        "Increase demand by (%)",
+        min_value=0,
+        max_value=100,
+        value=20
+    )
+
+    if st.button("Run Simulation"):
+        # --- Ensure all capacity columns are numeric ---
+        numeric_capacity_df = capacity_df.apply(pd.to_numeric, errors='coerce')
+
+        # --- Run the demand spike simulation ---
+        simulated = numeric_capacity_df * (1 + spike / 100)
+        simulated = simulated.astype(int)  # optional: convert to integers
+
+        # Prepare for chart
+        sim_long = simulated.reset_index().melt(
+            var_name="Model",
+            value_name="Simulated Units"
+        )
+
+        fig2 = px.bar(
+            sim_long,
+            x="Model",
+            y="Simulated Units",
+            text="Simulated Units"
+        )
+        fig2.update_layout(template="plotly_white")
+        st.plotly_chart(fig2, use_container_width=True)
+
+        st.subheader("⚠️ Likely Bottlenecks")
+        st.dataframe(bottlenecks_df, use_container_width=True)
+
+# =====================================================
+# FOOTER
+# =====================================================
 st.markdown("---")
-st.subheader("💡 Example Questions")
-st.markdown("""
-- How many scooters can we build next week?
-- Which suppliers are risky this month?
-- What parts are causing production delays?
-- If demand increases by 20%, what breaks first?
-- Which supplier should we renegotiate with?
-""")
+st.caption("Hugo AI Procurement Agent • Hackathon Demo Ready 🚀")
