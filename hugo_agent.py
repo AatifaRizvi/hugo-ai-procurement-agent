@@ -13,7 +13,7 @@ from agents.automation_engine import AutomationEngine
 # PATH CONFIG
 # =====================================================
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = BASE_DIR / "outputs"
 
 SNAPSHOT_FILE = OUTPUT_DIR / "operational_snapshot.json"

@@ -14,9 +14,16 @@ import pdfplumber
 from email import policy
 from email.parser import BytesParser
 
+<<<<<<< HEAD
 # -----------------------------
 # PATH CONFIGURATION
 # -----------------------------
+=======
+# =====================================================
+# PATH CONFIGURATION (MATCHES YOUR PROJECT STRUCTURE)
+# =====================================================
+
+>>>>>>> 3d1173089c8e952c50f9aaa4c1dd1aeb39cdb4d2
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data" / "hugo_data_samples"
 EMAIL_DIR = DATA_DIR / "emails"
