@@ -10,3 +10,4 @@ seaborn
 slack_sdk
 streamlit
 ollama
+plotly
