@@ -101,20 +101,31 @@ class HugoAgent:
             )
 
         prompt = f"""
-You are Hugo, an AI procurement agent.
+    You are an AI procurement analyst.
 
-Answer using ONLY the context.
-Be concise and business-focused.
+    Answer the user's question using ONLY the provided context.
 
-After the answer add:
+    When answering:
+- Group parts by common root causes
+- Explain why those causes are occurring
+- Highlight which causes are most critical
+- Do not simply list parts
+
+After your answer, add:
 Confidence: High / Medium / Low
+
+USER QUESTION:
+{question}
 
 CONTEXT:
 {json.dumps(ctx, indent=2)}
 
-QUESTION:
-{question}
+Rules:
+- Do not invent data
+- Do not perform calculations
+- Be precise and actionable
 """
+
         response = ollama.chat(
             model="gemma3:4b",
             messages=[{"role": "user", "content": prompt}],
@@ -139,6 +150,7 @@ QUESTION:
                 return (
                     "This question requires deeper reasoning.\n\n"
                     "Please start Ollama to enable AI responses.\n\n"
+                    "THis error indicates that the Ollama library is not installed or Ollama is not running.\n\n"
                     "**Confidence:** Low"
                 )
         except Exception:

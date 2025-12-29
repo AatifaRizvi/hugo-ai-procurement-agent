@@ -45,7 +45,15 @@ class BottleneckEngine:
                     cause = "late_replenishment"
                 else:
                     cause = "demand_spike"
-
+                #----------------------------
+                # Explanation
+                #----------------------------
+                if cause == "no_inbound_supply":
+                    explanation = "No upcoming purchase orders are scheduled for this part."
+                elif cause == "late_replenishment":
+                    explanation = "The next inbound shipment is expected after current stock is depleted."
+                else:
+                    explanation = "Recent demand is higher than the historical average."
                 # ----------------------------
                 # Capacity impact
                 # ----------------------------
@@ -70,7 +78,8 @@ class BottleneckEngine:
                     "root_cause": cause,
                     "used_in_models": used_in_models,
                     "capacity_impact": impacted_models,
-                    "assembly_constraints": model_constraints
+                    "assembly_constraints": model_constraints,
+                    "explanation": explanation
                 })
 
         return bottlenecks
