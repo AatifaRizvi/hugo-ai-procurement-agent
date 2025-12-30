@@ -1,3 +1,6 @@
+
+---
+
 # 🛵 Hugo – AI Procurement Agent
 
 **Hugo** is an AI-powered procurement and supply-chain intelligence agent. It bridges the gap between raw operational data and strategic decision-making by combining **deterministic rule-based logic** with **LLM-driven reasoning**.
@@ -18,7 +21,7 @@ Designed for hackathons and real-world operational scenarios, Hugo analyzes prod
 
 ### 📊 Production Capacity Analysis
 
-* Computes maximum buildable units per model based on real-time Bill of Materials (BOM) dependencies.
+* Computes maximum buildable units per model based on real-time **Bill of Materials (BOM)** dependencies.
 * Highlights specific capacity-limiting components to guide procurement priority.
 
 ### ⚠️ Bottleneck Detection
@@ -33,12 +36,12 @@ Designed for hackathons and real-world operational scenarios, Hugo analyzes prod
 
 ### 🔮 Demand Spike Simulation
 
-* **Real-world Modeling:** Hugo models risk evolution, scaling consumption rates to show how quickly "Days of Cover" deplete and when new bottlenecks will emerge.
+* **Real-world Modeling:** Hugo models risk evolution, scaling consumption rates to show how quickly "Days of Cover" deplete and when new bottlenecks emerge.
 
 ### 💬 AI Reasoning ("Ask Hugo")
 
 * Natural-language Q&A over live operational context.
-* Provides structured root-cause analysis and actionable mitigation steps using a supported Hugging Face model.
+* Provides structured root-cause analysis and actionable mitigation steps using Hugging Face models.
 
 ---
 
@@ -55,72 +58,76 @@ Hugo uses a **Hybrid Intelligence** design to ensure speed, reliability, and tra
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** Streamlit  
-* **Language:** Python 3.x  
-* **AI/LLM:** Hugging Face Inference API (supported model like `tiiuae/falcon-7b-instruct`)  
-* **Data Science:** Pandas, NumPy  
-* **Visualization:** Plotly  
-* **Deployment:** Streamlit Cloud (Fully cloud-native)  
+* **Frontend:** Streamlit
+* **Language:** Python 3.x
+* **AI/LLM:** Hugging Face Inference API (`mistralai/Mistral-7B-Instruct-v0.2:featherless-ai`)
+* **Data Science:** Pandas, NumPy
+* **Visualization:** Plotly
+* **Deployment:** Streamlit Cloud
 
 ---
 
 ## ⚙️ Installation & Usage
 
-### Local Setup (Windows / Mac / Linux)
+### Local Setup
 
 1. **Clone the repository:**
-
 ```bash
 git clone https://github.com/your-username/hugo-ai-procurement-agent.git
 cd hugo-ai-procurement-agent
-Install dependencies:
 
-bash
-Copy code
+```
+
+
+2. **Install dependencies:**
+```bash
 pip install -r requirements.txt
-Run the application:
 
-bash
-Copy code
-python data_processing.py       # Prepare operational snapshot
-streamlit run app.py            # Launch interactive dashboard
-⚠️ Note: To enable AI reasoning, set your Hugging Face token via your OS environment variables or Streamlit secrets (without committing it).
+```
 
-Windows (PowerShell):
 
-powershell
-Copy code
-$env:HF_TOKEN="your_huggingface_token_here"
-Windows (Command Prompt):
+3. **Set up your Environment Variables:**
+To enable AI reasoning, you must provide a Hugging Face token.
+* **Mac / Linux:** `export HF_TOKEN="your_token_here"`
+* **Windows (CMD):** `set HF_TOKEN=your_token_here`
+* **Windows (PowerShell):** `$env:HF_TOKEN="your_token_here"`
 
-cmd
-Copy code
-set HF_TOKEN=your_huggingface_token_here
-Mac / Linux:
 
-bash
-Copy code
-export HF_TOKEN="your_huggingface_token_here"
-Streamlit Cloud: Add your token in Settings → Secrets; do not commit it.
+4. **Run the application:**
+```bash
+python data_processing.py      # Prepare operational snapshot
+streamlit run app.py           # Launch interactive dashboard
 
-🔍 About the Simulation Model
+```
+
+
+
+---
+
+## 🔍 Simulation Logic
+
 Capacity does not change instantly. Hugo models supply chain physics accurately:
 
-Capacity: Fixed immediate potential based on current stock.
+* **Static Capacity:** Fixed immediate potential based on current stock.
+* **Demand Spike:** Increases the rate of inventory depletion.
+* **Outcome:** Hugo predicts the exact **point of failure** (time-to-zero) rather than just a generic percentage increase.
 
-Demand Spike: Increases the rate of inventory depletion.
+---
 
-Outcome: Hugo predicts the exact "point of failure" rather than just showing a percentage increase.
+## 🧪 Data & Disclaimer
 
-🧪 Data Source & Disclaimer
-All data is provided by hackathon organizers.
+* All data is provided by hackathon organizers.
+* Dataset is strictly for analysis and demonstration purposes.
+* No external, proprietary, or personally identifiable data (PII) is introduced.
 
-Dataset is strictly for analysis and demonstration purposes.
+---
 
-No external, proprietary, or personally identifiable data (PII) is introduced.
+## 👤 Authors
 
-👤 Authors
-Developed with ❤️ by Aatifa Rizvi and Lakshya Varshney for hackathon-based AI procurement intelligence projects.
+Developed with ❤️ by **Aatifa Rizvi** and **Lakshya Varshney** for hackathon-based AI procurement intelligence projects.
 
-📄 License
+## 📄 License
+
 This project is licensed under the MIT License.
+
+---
