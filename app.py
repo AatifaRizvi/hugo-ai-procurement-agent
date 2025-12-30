@@ -5,8 +5,23 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from hugo_agent import HugoAgent
 import numpy as np
+from hugo_agent import HugoAgent
+
+# =====================================================
+# UTILS
+# =====================================================
+def make_df_arrow_safe(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Ensures dataframe is Arrow-compatible by converting
+    object-type columns to strings.
+    """
+    df = df.copy()
+    for col in df.columns:
+        if df[col].dtype == "object":
+            df[col] = df[col].astype(str)
+    return df
+
 
 # =====================================================
 # PAGE CONFIG
@@ -50,14 +65,15 @@ with tabs[0]:
     supplier_df = pd.DataFrame(context["supplier_report"])
     alerts = context["alerts"]
 
-    # Metrics
+    # ---------------- Metrics ----------------
     c1, c2, c3 = st.columns(3)
     c1.metric("Scooter Models", len(capacity_df.columns))
     c2.metric("Bottlenecks", len(bottlenecks_df))
     c3.metric("Active Alerts", len(alerts))
 
-    # Capacity Chart
+    # ---------------- Capacity Chart ----------------
     st.subheader("📊 Build Capacity by Model")
+
     cap_long = capacity_df.reset_index().melt(
         var_name="Model",
         value_name="Max Units"
@@ -70,14 +86,20 @@ with tabs[0]:
         text="Max Units"
     )
     fig.update_layout(template="plotly_white")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch",key="dashboard_capacity_chart")
 
-    # Tables
+    # ---------------- Tables ----------------
     st.subheader("⚠️ Bottlenecks")
-    st.dataframe(bottlenecks_df, use_container_width=True)
+    st.dataframe(
+        make_df_arrow_safe(bottlenecks_df),
+        width="stretch"
+    )
 
     st.subheader("🏭 Supplier Risk")
-    st.dataframe(supplier_df, use_container_width=True)
+    st.dataframe(
+        make_df_arrow_safe(supplier_df),
+        width="stretch"
+    )
 
 # =====================================================
 # 💬 ASK HUGO (CHAT MODE)
@@ -92,7 +114,6 @@ with tabs[1]:
     for msg in st.session_state.chat:
         st.chat_message(msg["role"]).markdown(msg["content"])
 
-    # Chat input
     user_input = st.chat_input(
         "Ask about capacity, bottlenecks, suppliers, demand scenarios..."
     )
@@ -138,7 +159,7 @@ with tabs[3]:
 # 🔮 SCENARIO SIMULATION
 # =====================================================
 with tabs[4]:
-    st.header("🔮 Demand Spike Simulation")
+    st.header("🔮 Demand Spike Simulation (Risk-Based)")
 
     spike = st.slider(
         "Increase demand by (%)",
@@ -148,38 +169,87 @@ with tabs[4]:
     )
 
     if st.button("Run Simulation"):
-        # --- Ensure all capacity columns are numeric ---
-        numeric_capacity_df = capacity_df.apply(pd.to_numeric, errors='coerce')
-        MAX_DISPLAY_CAPACITY = 999  
-        # --- Run the demand spike simulation ---
-        simulated = numeric_capacity_df * (1 + spike / 100)
+        with st.spinner("Recomputing operational risk under demand spike..."):
+            sim_capacity, sim_bottlenecks, sim_snapshot = hugo.simulate_demand_spike(spike)
 
-        # Handle non-finite values safely
-        simulated = simulated.replace([np.inf, -np.inf], None)
-        simulated = simulated.fillna(0)
+        # -------------------------------
+        # Capacity (unchanged by design)
+        # -------------------------------
+        st.subheader("📊 Build Capacity (Immediate)")
 
-        # Convert to int for visualization
-        simulated = simulated.astype(int)
-        # Prepare for chart
-        sim_long = simulated.reset_index().melt(
+        st.info(
+            "Capacity represents immediate build potential. "
+            "Demand spikes affect risk over time, not instant capacity."
+        )
+
+        sim_capacity_df = pd.DataFrame(sim_capacity)
+
+        cap_long = sim_capacity_df.reset_index().melt(
             var_name="Model",
-            value_name="Simulated Units"
+            value_name="Max Units"
         )
 
-        fig2 = px.bar(
-            sim_long,
+        fig_cap = px.bar(
+            cap_long,
             x="Model",
-            y="Simulated Units",
-            text="Simulated Units"
+            y="Max Units",
+            text="Max Units",
+            title="Immediate Build Capacity"
         )
-        fig2.update_layout(template="plotly_white")
-        st.plotly_chart(fig2, use_container_width=True)
+        fig_cap.update_layout(template="plotly_white")
 
-        st.subheader("⚠️ Likely Bottlenecks")
-        st.dataframe(bottlenecks_df, use_container_width=True)
-        st.caption("Note: 999 indicates effectively unconstrained capacity.")
+        st.plotly_chart(
+            fig_cap,
+            width="stretch",
+            key=f"sim_capacity_chart_{spike}"
+        )
+
+        # -------------------------------
+        # Days of Cover (THIS WILL CHANGE)
+        # -------------------------------
+        st.subheader("🔥 Inventory Risk After Demand Spike")
+
+        sim_parts_df = pd.DataFrame(sim_snapshot)
+
+        doc_df = sim_parts_df[["part_id", "days_of_cover"]].copy()
+        doc_df = doc_df.sort_values("days_of_cover")
+
+        fig_doc = px.bar(
+            doc_df,
+            x="part_id",
+            y="days_of_cover",
+            title="Days of Cover After Demand Spike",
+            text="days_of_cover"
+        )
+        fig_doc.update_layout(template="plotly_white")
+
+        st.plotly_chart(
+            fig_doc,
+            width="stretch",
+            key=f"days_of_cover_chart_{spike}"
+        )
+
+        st.caption(
+            "Lower days of cover indicate higher stockout risk as demand increases."
+        )
+
+        # -------------------------------
+        # Bottlenecks
+        # -------------------------------
+        st.subheader("⚠️ Bottlenecks Under Increased Demand")
+
+        sim_bottlenecks_df = pd.DataFrame(sim_bottlenecks)
+
+        if sim_bottlenecks_df.empty:
+            st.success("No new bottlenecks detected under this demand scenario.")
+        else:
+            st.dataframe(
+                make_df_arrow_safe(sim_bottlenecks_df),
+                width="stretch"
+            )
+
 # =====================================================
 # FOOTER
 # =====================================================
 st.markdown("---")
-st.caption("Hugo AI Procurement Agent • Hackathon Demo Ready 🚀")
+st.caption("Hugo AI Procurement Agent • Hackathon Demo Ready")
