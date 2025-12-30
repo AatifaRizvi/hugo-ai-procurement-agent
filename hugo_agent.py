@@ -2,7 +2,7 @@ import json
 import os
 from pathlib import Path
 from openai import OpenAI
-
+import streamlit as st
 from agents.capacity_engine import CapacityEngine
 from agents.bottleneck_engine import BottleneckEngine
 from agents.supplier_engine import SupplierEngine
@@ -54,7 +54,7 @@ class HugoAgent:
         self.automation_engine = AutomationEngine(self.snapshot)
 
         # ---------------- HF Router Client ----------------
-        token = os.getenv("HF_TOKEN")
+        token = st.secrets.get("HF_TOKEN") or os.getenv("HF_TOKEN")
         if not token:
             raise RuntimeError("HF_TOKEN not set")
 
