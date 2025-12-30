@@ -1,47 +1,35 @@
 import json
 import os
 from pathlib import Path
-from huggingface_hub import InferenceClient
-import streamlit as st
+from openai import OpenAI
+
 from agents.capacity_engine import CapacityEngine
 from agents.bottleneck_engine import BottleneckEngine
 from agents.supplier_engine import SupplierEngine
 from agents.automation_engine import AutomationEngine
 
-# --------------------------------------------------
-# Configuration
-# --------------------------------------------------
-HF_MODEL = "tiiuae/falcon-7b-instruct"
+
+# ======================================================
+# CONFIG
+# ======================================================
+HF_ROUTER_BASE = "https://router.huggingface.co/v1"
+HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.2:featherless-ai"
 
 
-BASE_DIR = Path(__file__).resolve().parent
-OUTPUT_DIR = BASE_DIR / "outputs"
-
-# --------------------------------------------------
-# HF TOKEN LOADER
-# --------------------------------------------------
-def get_hf_token():
-    # Streamlit Cloud
-    if "HF_TOKEN" in st.secrets:
-        return st.secrets["HF_TOKEN"]
-
-    # Local environment
-    return os.getenv("HF_TOKEN")
-
-def load_json(path):
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-
+# ======================================================
+# HUGO AGENT
+# ======================================================
 class HugoAgent:
     def __init__(self):
         # ---------------- Load Data ----------------
-        self.snapshot = load_json(OUTPUT_DIR / "operational_snapshot.json")
-        self.model_dependencies = load_json(OUTPUT_DIR / "model_dependencies.json")
-        self.email_events = load_json(OUTPUT_DIR / "email_events.json")
-        self.bom_quantities = load_json(OUTPUT_DIR / "model_bom_quantities.json")
-        self.assembly_constraints = load_json(OUTPUT_DIR / "assembly_constraints.json")
+        base_dir = Path(__file__).resolve().parent
+        out = base_dir / "outputs"
+
+        self.snapshot = json.load(open(out / "operational_snapshot.json"))
+        self.model_dependencies = json.load(open(out / "model_dependencies.json"))
+        self.email_events = json.load(open(out / "email_events.json"))
+        self.bom_quantities = json.load(open(out / "model_bom_quantities.json"))
+        self.assembly_constraints = json.load(open(out / "assembly_constraints.json"))
 
         # ---------------- Engines ----------------
         self.capacity_engine = CapacityEngine(
@@ -65,14 +53,15 @@ class HugoAgent:
 
         self.automation_engine = AutomationEngine(self.snapshot)
 
-        # ---------------- HF Client ----------------
-        self.client = None
-        token = get_hf_token()
-        if token:
-            self.client = InferenceClient(
-                model=HF_MODEL,
-                token=token
-            )
+        # ---------------- HF Router Client ----------------
+        token = os.getenv("HF_TOKEN")
+        if not token:
+            raise RuntimeError("HF_TOKEN not set")
+
+        self.client = OpenAI(
+            base_url=HF_ROUTER_BASE,
+            api_key=token,
+        )
 
     # --------------------------------------------------
     def compute_context(self):
@@ -81,176 +70,148 @@ class HugoAgent:
             "bottlenecks": self.bottlenecks,
             "supplier_report": self.supplier_engine.analyze_suppliers(),
             "alerts": self.automation_engine.run_automation(),
+            "email_events": self.email_events,
+            "snapshot": self.snapshot,
         }
 
     # --------------------------------------------------
-    # RULE-BASED ANSWERS (FAST + DETERMINISTIC)
+    # RULE-BASED ANSWERS
     # --------------------------------------------------
     def rule_based_answer(self, question, ctx):
         q = question.lower()
 
-        if any(x in q for x in ["how many", "capacity", "build", "produce"]):
+        if any(x in q for x in ["capacity", "build", "produce"]):
             lines = [
                 f"- {m}: {v.get('max_buildable_units', 'N/A')} units"
                 for m, v in ctx["capacity_report"].items()
             ]
             return "📦 Production Capacity\n\n" + "\n".join(lines), "High"
 
-        if any(x in q for x in ["bottleneck", "delay", "break"]):
+        if "bottleneck" in q:
             if not ctx["bottlenecks"]:
                 return "No critical bottlenecks detected.", "High"
 
             lines = [
-                f"- {b.get('part', 'Unknown')} impacts {b.get('model', 'N/A')} "
-                f"({b.get('reason', 'constraint')})"
+                f"- {b['part']} impacts {b['model']} ({b['reason']})"
                 for b in ctx["bottlenecks"]
             ]
-            return "⚠️ Bottlenecks Detected\n\n" + "\n".join(lines), "High"
-
-        if any(x in q for x in ["supplier", "vendor", "risk"]):
-            risky = [
-                s for s in ctx["supplier_report"]
-                if s.get("risk_level", "Low") != "Low"
-            ]
-
-            if not risky:
-                return "All suppliers are currently stable.", "Medium"
-
-            lines = [
-                f"- {s.get('supplier', 'Unknown')} "
-                f"(Risk: {s.get('risk_level', 'Medium')})"
-                for s in risky
-            ]
-            return "🏭 Supplier Risk\n\n" + "\n".join(lines), "Medium"
+            return "⚠️ Bottlenecks\n\n" + "\n".join(lines), "High"
 
         return None, None
 
     # --------------------------------------------------
-    # LLM ANSWER (LOCAL ONLY)
+    # LLM ANSWER (HF ROUTER)
     # --------------------------------------------------
     def llm_answer(self, question, ctx):
-        if not self.client:
-            return (
-                "AI reasoning disabled (HF_TOKEN missing).\n\n"
-                "Confidence: Low"
-            )
+        
+        prompt = f"""
+You are acting as a Senior Procurement, Supply Chain, and Operations
+Intelligence Analyst advising executive leadership.
 
-        system_prompt = (
-    "You are a senior procurement and supply-chain intelligence analyst. "
-    "You specialize in capacity planning, inventory risk, and root-cause analysis. "
-    "You must perform structured, evidence-based reasoning using ONLY the provided context. "
-    "Think analytically, avoid generic summaries, and prioritize operational decision-making. "
-    "If multiple issues share the same failure mechanism, treat them as one systemic issue."
-)
+You must perform a DEEP, EVIDENCE-DRIVEN analysis using ALL the structured
+signals provided below. Your analysis should integrate operational data,
+capacity constraints, supplier risk, and unstructured email intelligence.
 
+STRICT RULES:
+- Use ONLY the information provided in the data below
+- Do NOT invent numbers, suppliers, or timelines
+- Do NOT use external knowledge
+- If information is missing, explicitly state the limitation
+- Every insight must be traceable to a specific signal or dataset
 
-        user_prompt = f"""
-Analyze the procurement and production situation using ONLY the context below.
+AVAILABLE DATA SOURCES (YOU MUST USE ALL WHERE RELEVANT):
 
-You MUST follow the exact structure and rules defined here.
+1. Capacity Report
+   - Model-wise maximum buildable units
+   - Derived from BOM constraints and inventory availability
 
-────────────────────────────────
-1. ROOT CAUSE ANALYSIS
-────────────────────────────────
-Identify 2-4 DISTINCT root causes (not symptoms).
+2. Bottleneck Analysis
+   - Parts causing production or assembly constraints
+   - Links between parts, models, and limiting factors
 
-For EACH root cause:
-- Clearly describe what is happening
-- Identify the affected parts and/or models
-- Explain WHY this issue exists using evidence from the context
-  (e.g., missing purchase orders, supplier inactivity, BOM dependency,
-   assembly constraints, capacity limits)
+3. Supplier Risk Signals
+   - Derived from unstructured email communications
+   - Includes delay notices, shortages, escalations, or risk language
 
-If multiple parts fail for the same reason, group them under one root cause.
-Do NOT list parts without explaining the mechanism behind the failure.
+4. Automation Alerts
+   - System-generated alerts based on thresholds and rules
 
-────────────────────────────────
-2. IMPACT ASSESSMENT
-────────────────────────────────
-For EACH root cause, explain:
-- Which production models are impacted
-- Whether the impact is:
-  • Immediate (0-3 days)
-  • Short-term (4-14 days)
-  • Medium-term (weeks)
-- Whether the constraint is:
-  • Capacity-limiting
-  • Assembly-limiting
-  • Supplier-risk-driven
+5. Raw Email Events
+   - Supplier communications containing qualitative risk indicators
+   - You must extract operational meaning from these emails
+   - Treat emails as early-warning signals, not confirmations
 
-Tie impact explicitly to operational outcomes
-(e.g., inability to build units, stalled assemblies, delayed deliveries).
+ANALYSIS OBJECTIVES:
 
-────────────────────────────────
-3. CRITICAL RISK PRIORITIZATION
-────────────────────────────────
-Rank the risks from MOST critical to LEAST critical.
+1. Root Cause Analysis
+   - Identify the primary and secondary drivers of risk
+   - Explicitly connect:
+     • Low inventory / days of cover
+     • Capacity shortfalls
+     • Bottleneck propagation
+     • Supplier communications (emails)
+   - Explain WHY the issues are occurring, not just WHAT is happening
 
-For EACH ranked risk, justify the priority using:
-- Days of cover / inventory runway
-- Breadth of dependency (how many models or assemblies are affected)
-- Lack of near-term mitigation (e.g., no upcoming POs, single supplier)
+2. Impact Assessment
+   - Describe downstream impact on:
+     • Production capacity
+     • Assembly feasibility
+     • Delivery timelines
+     • Supplier reliability
+   - Separate:
+     • Immediate operational impact
+     • Near-term planning impact
 
-Do NOT rank risks without justification.
+3. Risk Prioritization
+   - Rank the most critical risks by severity and urgency
+   - Justify ranking using:
+     • Days of cover
+     • Number of models affected
+     • Presence of supplier delay or risk language in emails
+     • Lack of alternate sourcing signals
 
-────────────────────────────────
-4. ACTIONABLE MITIGATION PLAN
-────────────────────────────────
-For EACH root cause, propose concrete and operational actions.
+4. Actionable Mitigation Strategy
+   - Provide CONCRETE actions, not generic advice
+   - Categorize actions into:
+     • Immediate (0-2 weeks)
+     • Near-term (1-2 months)
+     • Strategic (long-term resilience)
+   - Explicitly reference which data signal triggered each action
 
-Examples of acceptable actions:
-- Expedite or place purchase orders for specific parts
-- Reallocate inventory between models
-- Introduce alternate suppliers or temporary substitutes
-- Adjust production sequencing to protect high-priority models
+5. Executive Summary
+   - 3-5 concise bullet points
+   - Written for non-technical leadership
+   - Focus on decisions that must be made now
 
-Avoid generic advice like “monitor closely” or “improve planning.”
-
-────────────────────────────────
-RULES (NON-NEGOTIABLE)
-────────────────────────────────
-- Use ONLY the provided context
-- Do NOT invent numbers, timelines, or causes
-- Do NOT restate the context verbatim
-- Do NOT give high-level summaries without analysis
-- Every claim must be logically supported by the context
-
-QUESTION:
-{question}
-
-CONTEXT:
+DATA (STRUCTURED CONTEXT):
 {json.dumps(ctx, indent=2)}
 
-End your response with EXACTLY:
-Confidence: High / Medium / Low
+USER QUESTION:
+{question}
+
+RESPONSE REQUIREMENTS:
+- Use clear section headings
+- Use bullet points where appropriate
+- Be concise but thorough
+- Clearly reference data signals (capacity, bottlenecks, emails, alerts)
+
+End your response with exactly ONE of:
+Confidence: High
+Confidence: Medium
+Confidence: Low
 """
 
 
-        response = self.client.chat_completion(
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            max_tokens=300,
-            temperature=0.2,
-        )
-
-        return response.choices[0].message.content
-
-    # --------------------------------------------------
-    # ASK HUGO (BULLETPROOF)
-    # --------------------------------------------------
-    def ask(self, question):
-        ctx = self.compute_context()
-
-        # Rule-based fast path
-        answer, confidence = self.rule_based_answer(question, ctx)
-        if answer:
-            return f"{answer}\n\nConfidence: {confidence}"
-
-        # AI reasoning path
         try:
-            return self.llm_answer(question, ctx)
+            completion = self.client.chat.completions.create(
+                model=HF_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+                max_tokens=2000,
+            )
+
+            return completion.choices[0].message.content
+
         except Exception as e:
             return (
                 "AI reasoning temporarily unavailable.\n\n"
@@ -259,7 +220,17 @@ Confidence: High / Medium / Low
             )
 
     # --------------------------------------------------
-    # ANALYTICS TAB
+    def ask(self, question):
+        ctx = self.compute_context()
+
+        answer, conf = self.rule_based_answer(question, ctx)
+        if answer:
+            return f"{answer}\n\nConfidence: {conf}"
+
+        return self.llm_answer(question, ctx)
+
+    # --------------------------------------------------
+    # ANALYTICS
     # --------------------------------------------------
     def run_full_analysis(self):
         return f"""
@@ -268,18 +239,13 @@ System Overview
 • Models analyzed: {len(self.capacity_report)}
 • Bottlenecks detected: {len(self.bottlenecks)}
 • Active alerts: {len(self.automation_engine.run_automation())}
-
-Overall system is stable; supplier risks should be monitored.
 """
+
+    # --------------------------------------------------
+    # DEMAND SPIKE SIMULATION
+    # --------------------------------------------------
     def simulate_demand_spike(self, spike_percent: int):
-        """
-        Recompute operational risk under increased demand.
-        Demand affects consumption rate, not instantaneous capacity.
-        """
-
         multiplier = 1 + spike_percent / 100
-
-        # Deep copy snapshot (list of parts)
         simulated_snapshot = json.loads(json.dumps(self.snapshot))
 
         for part in simulated_snapshot:
@@ -288,7 +254,6 @@ Overall system is stable; supplier risks should be monitored.
                     part["avg_daily_consumption"] * multiplier, 2
                 )
 
-            # Recompute days of cover
             if part["avg_daily_consumption"] > 0:
                 part["days_of_cover"] = round(
                     part["on_hand"] / part["avg_daily_consumption"], 2
@@ -296,7 +261,6 @@ Overall system is stable; supplier risks should be monitored.
             else:
                 part["days_of_cover"] = float("inf")
 
-        # Capacity does NOT change immediately (this is correct)
         sim_capacity_engine = CapacityEngine(
             simulated_snapshot,
             self.model_dependencies,
@@ -312,3 +276,4 @@ Overall system is stable; supplier risks should be monitored.
         sim_bottlenecks = sim_bottleneck_engine.analyze_bottlenecks()
 
         return sim_capacity_report, sim_bottlenecks, simulated_snapshot
+# ==================================================
