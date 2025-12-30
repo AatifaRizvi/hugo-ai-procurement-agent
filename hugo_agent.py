@@ -11,7 +11,8 @@ from agents.automation_engine import AutomationEngine
 # --------------------------------------------------
 # Configuration
 # --------------------------------------------------
-HF_MODEL = "mistralai/Mistral-7B-Instruct-v0.2"
+HF_MODEL = "tiiuae/falcon-7b-instruct"
+
 
 BASE_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = BASE_DIR / "outputs"
