@@ -11,6 +11,11 @@ Designed for hackathons and real-world operational scenarios, Hugo analyzes prod
 🔗 **Streamlit App:**  
 https://r8e5jzllm2al3svjd3wqf8.streamlit.app/
 
+## Video Demo
+
+🔗 **Video Demo:**  
+https://youtu.be/o2F1ZOSjzOc?si=qlTxvf6dlQWdxKP2
+
 ---
 
 ## 🎯 Target Audience
